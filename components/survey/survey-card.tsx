@@ -329,15 +329,18 @@ export function SurveyCard() {
 
   const handleAddressSelect = (address: string, details: AddressDetails) => {
     setSurveyData({ ...surveyData, address })
-    setAddressVerified(true)
-    
-    // Check if address is in DMV area
+
+    // Geofence check FIRST. addressVerified only flips true after passing —
+    // otherwise dismissing the out-of-area popup with X lets the user proceed.
     if (!isInServiceArea(details.state)) {
       setSelectedState(details.state || "Unknown")
+      setAddressVerified(false)
       setShowOutOfAreaPopup(true)
       return
     }
     
+
+    setAddressVerified(true)
     // Auto-advance to next step after address selection (only if in DMV area)
     setTimeout(() => {
       setStep(2)
