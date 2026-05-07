@@ -75,13 +75,12 @@ const REASON_OPTIONS = [
   { id: "other", label: "Other" },
 ]
 
-// Ultra Homebuyers service areas
-const SERVICE_STATES = ["MD", "DC", "VA", "MI", "AL", "OH", "DE", "GA", "NY", "NJ"]
-
-// Check if address is in service area
+// Ultra Homebuyers — NATIONWIDE (no state restriction).
+// Address autocomplete already restricts to US via componentRestrictions.
+// We only block submissions with no state at all (i.e., user didn't pick
+// from the Google Places dropdown — the address is unverified).
 const isInServiceArea = (state: string | undefined): boolean => {
-  if (!state) return false
-  return SERVICE_STATES.includes(state.toUpperCase())
+  return Boolean(state)
 }
 
 // Valid US area codes
@@ -674,14 +673,14 @@ export function SurveyCard() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-amber-100 mb-4">
               <MapPin className="h-6 w-6 text-amber-600" />
             </div>
-            <DialogTitle className="text-center text-xl">Outside Our Service Area</DialogTitle>
+            <DialogTitle className="text-center text-xl">Address Not Recognized</DialogTitle>
             <DialogDescription className="text-center pt-2">
-              We currently only buy houses in <strong>select markets across the East Coast and Midwest</strong>.
+              We couldn&apos;t verify the address you entered. Please pick your address from the dropdown so we can look up your property.
             </DialogDescription>
           </DialogHeader>
           <div className="mt-2 rounded-lg bg-gray-50 p-4 text-center">
             <p className="text-sm text-gray-600">
-              The address you selected appears to be in <strong>{selectedState}</strong>, which is outside our service area.
+              Start typing again and select your address from the suggestions that appear.
             </p>
           </div>
           <div className="mt-4 flex flex-col gap-3">
