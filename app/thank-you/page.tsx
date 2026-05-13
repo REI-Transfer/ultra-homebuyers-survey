@@ -79,17 +79,18 @@ function FAQAccordion({ item }: { item: FAQItem }) {
 export default function ThankYouPage() {
   // Fire Facebook Lead event once on page load
   useEffect(() => {
-    let attempts = 0
-    const interval = setInterval(() => {
-      attempts++
-      if (window.fbq) {
-        window.fbq("track", "Lead")
-        clearInterval(interval)
+    // Lead event with eventID-based dedup. sessionStorage key persists across
+    // page reloads in the same browser session so Meta dedupes refresh fires.
+    try {
+      if (!window.fbq) return
+      const k = "lead_event_id"
+      let eid = sessionStorage.getItem(k)
+      if (!eid) {
+        eid = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+        sessionStorage.setItem(k, eid)
       }
-      if (attempts > 20) clearInterval(interval)
-    }, 500)
-
-    return () => clearInterval(interval)
+      window.fbq("track", "Lead", {}, { eventID: eid })
+    } catch {}
   }, [])
 
   return (
