@@ -1,8 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
+import Link from "next/link"
 import { CheckCircle2, ChevronDown, Phone } from "lucide-react"
 import { FooterLinks } from "@/components/polar/footer-links"
+import { ContactCTA } from "@/components/article/contact-cta"
+import { ARTICLES } from "@/lib/articles"
 
 
 interface FAQItem {
@@ -146,6 +150,49 @@ export default function ThankYouPage() {
               </div>
             </div>
           </div>
+
+          {/* Honest reads while you wait */}
+          <div className="mb-8 overflow-hidden rounded-2xl bg-white shadow-lg">
+            <div className="border-b border-gray-200 bg-gray-50 px-5 py-4">
+              <h2 className="text-base font-semibold text-gray-900">A Few Honest Reads While You Wait</h2>
+              <p className="text-xs text-gray-500">Plain-English answers to the questions most homeowners have before they sell.</p>
+            </div>
+            <div className="divide-y divide-gray-100">
+              {ARTICLES.slice(0, 4).map((a) => (
+                <Link
+                  key={a.slug}
+                  href={a.slug}
+                  className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-gray-50 no-underline"
+                >
+                  <Image
+                    src={a.image}
+                    alt={a.title}
+                    width={88}
+                    height={64}
+                    className="h-[64px] w-[88px] shrink-0 rounded-md object-cover bg-gray-100"
+                  />
+                  <div>
+                    <h3 className="text-sm md:text-[15px] font-semibold leading-snug text-gray-900">{a.title}</h3>
+                    <span className="mt-1 inline-block text-xs font-semibold text-[#1a3d6b]">Read the article →</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            <div className="px-5 py-3 text-center">
+              <Link href="/articles" className="text-sm font-semibold text-[#1a3d6b] underline">
+                See all articles
+              </Link>
+            </div>
+          </div>
+
+          {/* Two-button text/call CTA */}
+          <ContactCTA
+            phoneDisplay="(866) 453-6019"
+            phoneHref="8664536019"
+            smsKeyword="OFFER"
+            heading="Have a question before we call?"
+            subheading="Send us a quick text or give us a call. A team member will get right back to you."
+          />
 
           {/* FAQ Section */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-lg">

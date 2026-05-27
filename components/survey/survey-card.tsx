@@ -157,10 +157,20 @@ function validateName(name: string): { valid: boolean; msg: string } {
   return { valid: true, msg: "" }
 }
 
-export function SurveyCard() {
-  const [step, setStep] = useState(1)
+// Additive seed props (advertorial only). The advertorial's sticky top address bar
+// captures + validates the address, then opens this card in a popup already advanced
+// to step 2 (property type). When the card is used on its own (the main landing page),
+// these are undefined and behavior is exactly as before. NOTHING about the submit,
+// webhook, or phone wiring changes. These only pre-fill the address and starting step.
+interface SurveyCardProps {
+  initialAddress?: string
+  initialStep?: number
+}
+
+export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}) {
+  const [step, setStep] = useState(initialStep && initialStep > 1 ? initialStep : 1)
   const [surveyData, setSurveyData] = useState<SurveyData>({
-    address: "",
+    address: initialAddress ?? "",
     propertyType: "",
     isLegalOwner: "",
     listedOnMarket: "",
@@ -174,8 +184,10 @@ export function SurveyCard() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isDisqualified, setIsDisqualified] = useState(false)
   const [disqualifyReason, setDisqualifyReason] = useState("")
-  // Track if address was selected from Google autocomplete (not just typed)
-  const [addressVerified, setAddressVerified] = useState(false)
+  // Track if address was selected from Google autocomplete (not just typed).
+  // When the advertorial seeds a validated address and opens at step 2, treat it
+  // as verified so Back-to-step-1 navigation keeps the Continue button enabled.
+  const [addressVerified, setAddressVerified] = useState(Boolean(initialAddress && initialStep && initialStep > 1))
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({})
   const formStartTime = useRef<number>(Date.now())
