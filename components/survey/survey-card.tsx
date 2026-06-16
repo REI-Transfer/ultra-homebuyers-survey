@@ -260,6 +260,11 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
         console.error('Submit error:', e)
       }
 
+      // Persist condition so the thank-you page can gate the Meta Lead event.
+      // Excellent / move-in-ready leads should still submit (above) but must
+      // NOT fire the real Lead pixel event.
+      try { sessionStorage.setItem("lead_condition", surveyData.condition) } catch {}
+
       // Redirect to thank-you page
       window.location.href = '/thank-you'
     } else if (step < totalSteps) {

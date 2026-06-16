@@ -93,7 +93,16 @@ export default function ThankYouPage() {
         eid = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
         sessionStorage.setItem(k, eid)
       }
-      window.fbq("track", "Lead", {}, { eventID: eid })
+      // Excellent / move-in-ready leads still submit to the CRM but must NOT
+      // pollute the Meta "Lead" conversion. Read the condition the survey
+      // persisted before redirect; only fire Lead for non-excellent. Excellent
+      // fires a low-intent custom event instead.
+      const __c = (typeof window !== "undefined") ? sessionStorage.getItem("lead_condition") : null
+      if (__c !== "excellent") {
+        window.fbq("track", "Lead", {}, { eventID: eid })
+      } else {
+        window.fbq("trackCustom", "LeadLowIntent", {}, { eventID: eid })
+      }
     } catch {}
   }, [])
 
