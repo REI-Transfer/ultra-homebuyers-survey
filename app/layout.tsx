@@ -4,6 +4,7 @@ import { Plus_Jakarta_Sans } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { FacebookPixel } from "@/components/tracking/facebook-pixel"
 import Script from "next/script"
+import { GoFunnelTracking } from "@/components/tracking/gofunnel-tracking"
 import "./globals.css"
 
 const plusJakartaSans = Plus_Jakarta_Sans({ subsets: ["latin"], display: "swap" })
@@ -39,6 +40,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`font-sans antialiased ${plusJakartaSans.className}`}>
         {children}
+        <GoFunnelTracking />
         <FacebookPixel />
         <Script
           src="//cdn.callrail.com/companies/968439646/71b22898e513025b3cb2/12/swap.js"
