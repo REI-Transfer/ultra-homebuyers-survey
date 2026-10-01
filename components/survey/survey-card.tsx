@@ -242,12 +242,22 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
 
       // Submit to webhook
       try {
+        // One event id per lead, shared by the /thank-you browser Lead (it reads
+        // sessionStorage "lead_event_id") and the GoFunnel server Lead
+        // (/api/submit forwards meta_event_id as idempotencyKey), so Meta dedupes them.
+        const eventId = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+        try { sessionStorage.setItem('lead_event_id', eventId) } catch {}
+        // Label the server event the same way the thank-you page labels the
+        // browser event: a move-in-ready seller is captured, but is not a Lead.
+        const isExcellentCondition = surveyData.condition === 'excellent'
         const payload = {
           ...surveyData,
           gf_sid: readGfSid(),
           ...trackingRef.current,
           source: 'Ultra Homebuyers - Survey',
           submittedAt: new Date().toISOString(),
+          meta_event_id: eventId,
+          meta_event_name: isExcellentCondition ? 'LeadLowIntent' : 'Lead',
         }
         const res = await fetch('/api/submit', {
           method: 'POST',
