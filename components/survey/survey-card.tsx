@@ -240,6 +240,17 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
       
       setIsSubmitting(true)
 
+      // Meta event for this lead, decided ONCE here and shared by both senders:
+      // /thank-you fires it in the browser with this id as eventID, and /api/submit
+      // forwards the same id + name to GoFunnel (idempotencyKey), so Meta dedupes them.
+      // Gating rule unchanged: excellent / move-in-ready condition -> LeadLowIntent.
+      const eventId = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+      const eventName = surveyData.condition !== "excellent" ? "Lead" : "LeadLowIntent"
+      try {
+        sessionStorage.setItem("lead_event_id", eventId)
+        sessionStorage.setItem("lead_event_name", eventName)
+      } catch {}
+
       // Submit to webhook
       try {
         const payload = {
@@ -248,6 +259,8 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
           ...trackingRef.current,
           source: 'Ultra Homebuyers - Survey',
           submittedAt: new Date().toISOString(),
+          meta_event_id: eventId,
+          meta_event_name: eventName,
         }
         const res = await fetch('/api/submit', {
           method: 'POST',
@@ -260,11 +273,6 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
       } catch (e) {
         console.error('Submit error:', e)
       }
-
-      // Persist condition so the thank-you page can gate the Meta Lead event.
-      // Excellent / move-in-ready leads should still submit (above) but must
-      // NOT fire the real Lead pixel event.
-      try { sessionStorage.setItem("lead_condition", surveyData.condition) } catch {}
 
       // Redirect to thank-you page
       window.location.href = '/thank-you'

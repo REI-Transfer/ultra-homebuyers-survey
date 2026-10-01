@@ -83,27 +83,35 @@ function FAQAccordion({ item }: { item: FAQItem }) {
 export default function ThankYouPage() {
   // Fire Facebook Lead event once on page load
   useEffect(() => {
-    // Lead event with eventID-based dedup. sessionStorage key persists across
-    // page reloads in the same browser session so Meta dedupes refresh fires.
-    try {
-      if (!window.fbq) return
-      const k = "lead_event_id"
-      let eid = sessionStorage.getItem(k)
-      if (!eid) {
-        eid = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
-        sessionStorage.setItem(k, eid)
+    // The pixel initialises ~3 s after page load (facebook-pixel.tsx), so poll for
+    // fbq (every 500 ms, ~10 s max) instead of checking once — restores the wait
+    // this page had before 2026-05-13.
+    let attempts = 0
+    const interval = setInterval(() => {
+      attempts++
+      if (window.fbq) {
+        clearInterval(interval)
+        // Fire the event the survey card decided, with the id it sent to
+        // /api/submit (GoFunnel), so browser + server dedupe. sessionStorage
+        // persists across reloads in the session so refresh fires dedupe too.
+        try {
+          const k = "lead_event_id"
+          let eid = sessionStorage.getItem(k)
+          if (!eid) {
+            eid = `lead-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+            sessionStorage.setItem(k, eid)
+          }
+          if (sessionStorage.getItem("lead_event_name") === "LeadLowIntent") {
+            window.fbq("trackCustom", "LeadLowIntent", {}, { eventID: eid })
+          } else {
+            window.fbq("track", "Lead", {}, { eventID: eid })
+          }
+        } catch {}
       }
-      // Excellent / move-in-ready leads still submit to the CRM but must NOT
-      // pollute the Meta "Lead" conversion. Read the condition the survey
-      // persisted before redirect; only fire Lead for non-excellent. Excellent
-      // fires a low-intent custom event instead.
-      const __c = (typeof window !== "undefined") ? sessionStorage.getItem("lead_condition") : null
-      if (__c !== "excellent") {
-        window.fbq("track", "Lead", {}, { eventID: eid })
-      } else {
-        window.fbq("trackCustom", "LeadLowIntent", {}, { eventID: eid })
-      }
-    } catch {}
+      if (attempts > 20) clearInterval(interval)
+    }, 500)
+
+    return () => clearInterval(interval)
   }, [])
 
   return (
