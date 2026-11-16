@@ -202,10 +202,10 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
   const [showOutOfAreaPopup, setShowOutOfAreaPopup] = useState(false)
   const [selectedState, setSelectedState] = useState("")
 
-  const totalSteps = 8
+  const totalSteps = 7
 
   const handleNext = async () => {
-    if (step === 8) {
+    if (step === 7) {
       // Validate contact info before submitting
       const errors: {[key: string]: string} = {}
 
@@ -298,12 +298,10 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
       case 4:
         return surveyData.listedOnMarket !== ""
       case 5:
-        return surveyData.timeline !== ""
-      case 6:
         return surveyData.condition !== ""
-      case 7:
+      case 6:
         return surveyData.reason !== ""
-      case 8:
+      case 7:
         return (
           surveyData.name.trim().length > 0 &&
           surveyData.email.trim().length > 0 &&
@@ -555,23 +553,8 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
           </div>
         )}
 
-        {/* Step 5: Timeline */}
+        {/* Step 5: Condition */}
         {step === 5 && (
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900">How fast are you looking to sell?</h2>
-              <p className="mt-1 text-sm text-gray-500">Select your ideal timeline for closing.</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              {TIMELINE_OPTIONS.map((option) =>
-                renderOptionButton(option, surveyData.timeline, "timeline")
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Step 6: Condition */}
-        {step === 6 && (
           <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">What condition is the property in?</h2>
@@ -585,8 +568,8 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
           </div>
         )}
 
-        {/* Step 7: Reason */}
-        {step === 7 && (
+        {/* Step 6: Reason */}
+        {step === 6 && (
           <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">What's your reason for selling?</h2>
@@ -600,8 +583,8 @@ export function SurveyCard({ initialAddress, initialStep }: SurveyCardProps = {}
           </div>
         )}
 
-        {/* Step 8: Contact Information */}
-        {step === 8 && (
+        {/* Step 7: Contact Information */}
+        {step === 7 && (
           <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">How can we reach you?</h2>
